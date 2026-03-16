@@ -1,0 +1,15 @@
+/Users/jeonghanhee/Desktop/Repositories/dove/bin/Debug/net9.0/dove
+/Users/jeonghanhee/Desktop/Repositories/dove/bin/Debug/net9.0/dove.deps.json
+/Users/jeonghanhee/Desktop/Repositories/dove/bin/Debug/net9.0/dove.runtimeconfig.json
+/Users/jeonghanhee/Desktop/Repositories/dove/bin/Debug/net9.0/dove.dll
+/Users/jeonghanhee/Desktop/Repositories/dove/bin/Debug/net9.0/dove.pdb
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/dove.GeneratedMSBuildEditorConfig.editorconfig
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/dove.AssemblyInfoInputs.cache
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/dove.AssemblyInfo.cs
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/dove.csproj.CoreCompileInputs.cache
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/dove.sourcelink.json
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/dove.dll
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/refint/dove.dll
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/dove.pdb
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/dove.genruntimeconfig.cache
+/Users/jeonghanhee/Desktop/Repositories/dove/obj/Debug/net9.0/ref/dove.dll

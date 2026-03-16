@@ -80,18 +80,11 @@ class Folder:
         shell32.SHChangeNotify(0x00001000, 0x0005, ctypes.c_wchar_p(parent_path), None)
 
     def _set_macos_icon(self):
-        def _escape_applescript(path: str) -> str:
-            return path.replace("\\", "\\\\").replace('"', '\\"')
-        
-        icon_path_esc = _escape_applescript(self.icon_path)
-        target_path_esc = _escape_applescript(self.path)
-
         try:
-            subprocess.run(["fileicon", "set", self.path, self.icon_path], check=True, capture_output=True)
-            return
-        except (FileNotFoundError, subprocess.CalledProcessError):
-            script = f'tell application "Finder" to set icon of (POSIX file "{target_path_esc}" as alias) to (POSIX file "{icon_path_esc}" as alias)'
-            subprocess.run(["osascript", "-e", script])
+            subprocess.run(["fileicon", "set", self.path, self.icon_path], check=True)
+            subprocess.run(["killall", "Finder"])
+        except (FileNotFoundError, subprocess.CalledProcessError) as e:
+            print(f"fileicon failed: {e}")
 
     def _start_watch(self):
         if self.system not in ["Windows", "Darwin"]: return

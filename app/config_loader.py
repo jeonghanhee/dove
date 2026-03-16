@@ -7,6 +7,7 @@ config = configparser.ConfigParser()
 config.read(CONFIG_PATH, encoding="utf-8")
 
 # app
+APP_ID = config.get("App", "app_id")
 APP_NAME = config.get("App", "app_name")
 APP_TITLE = config.get("App", "app_title")
 

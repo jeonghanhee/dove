@@ -8,8 +8,13 @@ config.read(CONFIG_PATH, encoding="utf-8")
 
 # app
 APP_ID = config.get("App", "app_id")
-APP_NAME = config.get("App", "app_name")
-APP_TITLE = config.get("App", "app_title")
+APP_PROG = config.get("App", "app_prog")
+APP_DESCRIPTION = config.get("App", "app_description")
+APP_VERSION = config.get("App", "app_version")
+
+# notification
+NOTIFICATION_NAME = config.get("Notification", "notification_name")
+NOTIFICATION_TITLE = config.get("Notification", "notification_title")
 
 # file
 FOLDER_NAME = config.get("Folder", "folder_name")
@@ -18,6 +23,10 @@ ASSETS_ICONS_FOLDER = os.path.join(os.path.dirname(__file__), "..", config.get("
 
 # file
 FILE_EXTENSION = config.get("File", "file_extension")
+
+# server
+API_URL = config.get("Server", "api_url")
+WS_URL = config.get("Server", "ws_url")
 
 # messages
 def get_message(section: str, name: str) -> tuple[str, str]:

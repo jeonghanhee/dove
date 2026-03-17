@@ -1,3 +1,6 @@
 watchdog==6.0.0
 winotify==1.1.0
 pystray==0.19.5
+keyring==25.7.0
+requests==2.32.5
+websockets==16.0

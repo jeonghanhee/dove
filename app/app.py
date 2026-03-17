@@ -1,21 +1,41 @@
-from pystray import Icon, MenuItem, Menu
-from PIL import Image, ImageDraw
-from .folder import Folder
-from .config_loader import FOLDER_NAME, APP_NAME, APP_TITLE
-from . import state
+from .config_loader import FOLDER_NAME
+from .state import state
 
-def create_image():
-    image = Image.new('RGB', (64, 64), color='white')
-    draw = ImageDraw.Draw(image)
-    draw.ellipse((8, 8, 56, 56), fill='gray')
-    return image
+class DoveApp:
+    def start_folder(self):
+        from .folder import DoveFolder
+        state.folder = DoveFolder.load()
+        if not state.folder:
+            state.folder = DoveFolder(FOLDER_NAME)
+            state.folder.create_directory()
+        state.folder.start_watch()
 
-def quit_action(icon):
-    icon.stop()
+    def start_ws(self):
+        from .ws import WsClient
+        state.ws = WsClient()
+        state.ws.on_message(lambda msg: print("[ws]", msg))
+        state.ws.start()
 
-def run():
-    state.folder = Folder(FOLDER_NAME)
-    state.folder.create()
+    def stop(self):
+        if state.ws:
+            state.ws.stop()
+        if state.folder:
+            state.folder.stop_watch()
 
-    icon = Icon(APP_NAME, create_image(), APP_TITLE, menu=Menu(MenuItem("Quit", lambda icon, item: quit_action(icon))))
-    icon.run()
+    def run(self):
+        print("Preparing to launch...")
+        self.start_folder()
+        self.start_ws()
+        print("Application started successfully.")
+
+    @property
+    def folder(self):
+        return state.folder
+
+    @property
+    def jwt(self):
+        return state.jwt
+
+    @property
+    def ws(self):
+        return state.ws

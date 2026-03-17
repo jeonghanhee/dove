@@ -4,6 +4,7 @@ import subprocess
 import ctypes
 import threading
 from watchdog.observers import Observer
+from .storable import Storable
 from .config_loader import FOLDER_NAME, ASSETS_ICONS_FOLDER
 from .handler import FileRenameHandler
 
@@ -12,7 +13,7 @@ ATTR_HIDDEN = 0x02
 ATTR_SYSTEM = 0x04
 ATTR_NORMAL = 0x80
 
-class Folder:
+class DoveFolder(Storable):
     def __init__(self, name=FOLDER_NAME):
         self.name = name
         self.is_born = False
@@ -27,10 +28,10 @@ class Folder:
         self.name = new_name
         self.path = os.path.join(self.desktop, self.name)
 
-    def create(self):
+    def create_directory(self):
         os.makedirs(self.path, exist_ok=True)
         self.set_icon()
-        self._start_watch()
+        self.save()
 
     def set_icon(self):
         if not self.is_born:
@@ -39,11 +40,21 @@ class Folder:
             self.icon_file = "dove.ico" if self.system == "Windows" else "dove.icns"
 
         self.icon_path = os.path.abspath(os.path.join(ASSETS_ICONS_FOLDER, self.icon_file))
-        
+
         if self.system == "Windows":
             self._set_windows_icon()
         elif self.system == "Darwin":
             self._set_macos_icon()
+            
+    def start_watch(self):
+        if self.system not in ["Windows", "Darwin"]:
+            return
+        if not self.is_born:    
+            parent_dir = os.path.dirname(self.path)
+            self._observer = Observer()
+            self._observer.schedule(FileRenameHandler(self), path=parent_dir, recursive=False)
+            threading.Thread(target=self._observer.start, daemon=True).start()
+        threading.Thread(target=self._watch_deleted, daemon=True).start()
 
     def _set_windows_icon(self):
         desktop_ini = os.path.join(self.path, "desktop.ini")
@@ -85,10 +96,29 @@ class Folder:
             subprocess.run(["killall", "Finder"])
         except (FileNotFoundError, subprocess.CalledProcessError) as e:
             print(f"fileicon failed: {e}")
+        
+    def _watch_deleted(self):
+        while True:
+            if not os.path.exists(self.path):
+                if Folder.exists():
+                    Folder.delete() 
+                break
+            threading.Event().wait(2)
 
-    def _start_watch(self):
-        if self.system not in ["Windows", "Darwin"]: return
-        parent_dir = os.path.dirname(self.path)
-        self._observer = Observer()
-        self._observer.schedule(FileRenameHandler(self), path=parent_dir, recursive=False)
-        threading.Thread(target=self._observer.start, daemon=True).start()
+    def _to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "is_born": self.is_born,
+            "icon_file": self.icon_file,
+            "icon_path": self.icon_path,
+        }
+
+    def _from_dict(self, data: dict) -> None:
+        self.name = data["name"]
+        self.is_born = data["is_born"]
+        self.icon_file = data.get("icon_file")
+        self.icon_path = data.get("icon_path")
+        self.system = platform.system()
+        self.desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+        self.path = os.path.join(self.desktop, self.name)
+        self._observer = None

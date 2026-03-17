@@ -2,8 +2,8 @@ import os
 import time
 import threading
 from watchdog.events import FileSystemEventHandler
-from .notifier import send_notification
-from .config_loader import get_message
+from src.network.notifier import send_notification
+from src.storage.loader import get_message
 
 class FileRenameHandler(FileSystemEventHandler):
     def __init__(self, folder_obj):

@@ -4,9 +4,9 @@ import subprocess
 import ctypes
 import threading
 from watchdog.observers import Observer
-from .storable import Storable
-from .config_loader import FOLDER_NAME, ASSETS_ICONS_FOLDER
-from .handler import FileRenameHandler
+from .handlers import FileRenameHandler
+from src.storage.storable import Storable
+from src.storage.loader import FOLDER_NAME, ASSETS_ICONS_FOLDER
 
 ATTR_READONLY = 0x01
 ATTR_HIDDEN = 0x02
@@ -100,8 +100,8 @@ class DoveFolder(Storable):
     def _watch_deleted(self):
         while True:
             if not os.path.exists(self.path):
-                if Folder.exists():
-                    Folder.delete() 
+                if DoveFolder.exists():
+                    DoveFolder.delete() 
                 break
             threading.Event().wait(2)
 

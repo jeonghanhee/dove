@@ -1,7 +1,7 @@
 import os
 import configparser
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "../config.ini")
+CONFIG_PATH = os.path.join(os.path.dirname(__file__), "../../config.ini")
 
 config = configparser.ConfigParser()
 config.read(CONFIG_PATH, encoding="utf-8")
@@ -25,7 +25,6 @@ ASSETS_ICONS_FOLDER = os.path.join(os.path.dirname(__file__), "..", config.get("
 FILE_EXTENSION = config.get("File", "file_extension")
 
 # server
-API_URL = config.get("Server", "api_url")
 WS_URL = config.get("Server", "ws_url")
 
 # messages

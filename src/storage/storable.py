@@ -1,8 +1,7 @@
 import json
 import keyring
 from datetime import datetime
-from typing import TYPE_CHECKING
-from .config_loader import APP_ID
+from src.storage.loader import APP_ID
 
 class Storable:
     def save(self, name: str = None) -> str:

@@ -2,8 +2,7 @@ import asyncio
 import json
 import threading
 import websockets
-from .state import state
-from .config_loader import WS_URL
+from src.storage.loader import WS_URL
 
 class WsClient:
     def __init__(self):
@@ -27,11 +26,9 @@ class WsClient:
         self._loop.run_until_complete(self._connect())
 
     async def _connect(self):
-        headers = self._auth_headers()
-
         while self._running:
             try:
-                async with websockets.connect(WS_URL, additional_headers=headers) as ws:
+                async with websockets.connect(WS_URL) as ws:
                     self._ws = ws
                     print(f"Connected: {WS_URL}")
                     await self._receive_loop(ws)
@@ -68,8 +65,3 @@ class WsClient:
         if self._loop and self._ws:
             asyncio.run_coroutine_threadsafe(self._ws.close(), self._loop)
         print("Terminated")
-
-    def _auth_headers(self) -> dict:
-        if state.jwt and state.jwt.access_token:
-            return {"Authorization": f"Bearer {state.jwt.access_token}"}
-        return {}

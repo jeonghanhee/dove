@@ -1,14 +1,12 @@
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .folder import DoveFolder
-    from .jwt import JwtToken
-    from .ws import WsClient
+    from src.filesystem.folder import DoveFolder
+    from src.network.ws import WsClient
     
 class State:
     _instance = None
     folder: "DoveFolder | None"
-    jwt: "JwtToken | None"
     ws: "WsClient | None"
 
     def __new__(cls):

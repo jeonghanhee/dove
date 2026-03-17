@@ -1,4 +1,4 @@
-from .storable import Storable
+from src.storage.storable import Storable
 
 class JwtToken(Storable):
     def __init__(self, access_token="", refresh_token="", expires_at=None):

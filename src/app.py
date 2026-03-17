@@ -1,85 +1,81 @@
-import sys
-from .storage.loader import FOLDER_NAME
-from .storage.state import state
-from .filesystem.folder import DoveFolder
-from .network.ws import WsClient
-from .tray import DoveTray
+import threading
+from .config_loader import FOLDER_NAME, APP_ID
 
 class DoveApp:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(DoveApp, cls).__new__(cls)
+            cls._instance.folder = None
+            cls._instance.token = None
+            cls._instance.ws = None
+            cls._instance.tray = None
+            cls._instance._initialized = False
+            cls._instance._engine_started = False
+        return cls._instance
+
     def __init__(self):
-        self.tray = DoveTray()
+        if not self._initialized:
+            from .tray import DoveTray
+            self.tray = DoveTray()
+            self._initialized = True
+
+    def load_token(self):
+        from .network.auth import JwtToken
+        self.token = JwtToken.load()
 
     def create_folder(self) -> bool:
+        from .filesystem.folder import DoveFolder
         try:
-            state.folder = DoveFolder.load()
-            if not state.folder:
-                state.folder = DoveFolder(FOLDER_NAME)
-                state.folder.create_directory()
+            self.folder = DoveFolder.load()
+            if not self.folder:
+                self.folder = DoveFolder(FOLDER_NAME)
+                self.folder.create_directory()
 
-            if not state.folder.exists():
-                print("Folder validation failed: folder does not exist.")
+            if not self.folder.exists():
+                print("Folder validation failed.")
                 return False
 
-            state.folder.start_watch()
-            print("Folder started successfully.")
+            self.folder.start_watch()
             return True
         except Exception as err:
             print(f"Failed to start folder: {err}")
             return False
 
     def start_ws(self) -> bool:
+        from .network.ws import WsClient
         try:
-            state.ws = WsClient()
-            state.ws.on_message(lambda msg: print("[ws]", msg))
-            state.ws.start()
-
-            # if not state.ws.is_connected():
-            #     print("WebSocket validation failed: not connected.")
-            #     return False
-
-            print("WebSocket started successfully.")
+            self.ws = WsClient()
+            self.ws.on_message(lambda msg: print("[ws]", msg))
+            self.ws.start()
             return True
         except Exception as err:
             print(f"Failed to start WebSocket: {err}")
             return False
 
     def stop(self):
-        if state.ws:
-            state.ws.stop()
-        if state.folder:
-            state.folder.stop_watch()
+        if self.ws:
+            self.ws.stop()
+        if self.folder:
+            self.folder.stop_watch()
+        self.token = None
         print("Application services stopped.")
 
     def run(self):
-        print("Preparing to launch engine...")
+        print(f"Launching {APP_ID} program...")
+
+        self.load_token()
 
         if not self.create_folder():
-            print("Cannot create folder.")
-            sys.exit(1)
+            return 
 
         if not self.start_ws():
-            print("Cannot start WebSocket.")
-            sys.exit(1)
+            return
+        
+        if self.tray:
+            tray_thread = threading.Thread(target=self.tray.run, daemon=True)
+            tray_thread.start()
+            print("Tray thread started.")
 
-        print("Application engine started successfully.")
-
-        try:
-            self.tray.run()
-        finally:
-            self.stop()
-            
-    @property
-    def folder(self):
-        return state.folder
-
-    @property
-    def jwt(self):
-        return state.jwt
-
-    @property
-    def ws(self):
-        return state.ws
-
-if __name__ == "__main__":
-    app = DoveApp()
-    app.run()
+        print(f"{APP_ID} engine services are now active.")

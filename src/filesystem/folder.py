@@ -5,8 +5,8 @@ import ctypes
 import threading
 from watchdog.observers import Observer
 from .handlers import FileRenameHandler
-from src.storage.storable import Storable
-from src.storage.loader import FOLDER_NAME, ASSETS_ICONS_FOLDER
+from src.util.storable import Storable
+from src.config_loader import FOLDER_NAME, ASSETS_ICONS_FOLDER
 
 ATTR_READONLY = 0x01
 ATTR_HIDDEN = 0x02

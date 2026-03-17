@@ -2,7 +2,7 @@ import asyncio
 import json
 import threading
 import websockets
-from src.storage.loader import WS_URL
+from src.config_loader import WS_URL
 
 class WsClient:
     def __init__(self):

@@ -1,6 +1,6 @@
 import platform
 import subprocess
-from src.storage.loader import APP_ID
+from src.config_loader import APP_ID
 
 system = platform.system()
 

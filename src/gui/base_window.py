@@ -1,20 +1,18 @@
-import os
-import sys
-
-base_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(base_dir)
-
-if base_dir not in sys.path:
-    sys.path.append(base_dir)
-if parent_dir not in sys.path:
-    sys.path.append(parent_dir)
-
 from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout
+from PyQt6.QtCore import Qt
 
 class BaseWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setStyleSheet("background-color: #2C2C2C;")
+
+        self.setWindowFlags(
+            Qt.WindowType.Window | 
+            Qt.WindowType.CustomizeWindowHint | 
+            Qt.WindowType.WindowTitleHint | 
+            Qt.WindowType.WindowCloseButtonHint |
+            Qt.WindowType.MSWindowsFixedSizeDialogHint
+        )
         
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -22,7 +20,10 @@ class BaseWindow(QMainWindow):
         self.layout = QVBoxLayout(self.central_widget)
         self.layout.setContentsMargins(10, 10, 10, 10)
         self.layout.setSpacing(15)
-        
+
+    def lock_size(self, width, height):
+        self.setFixedSize(width, height)
+
     def center_window(self):
         qr = self.frameGeometry()
         cp = self.screen().availableGeometry().center()

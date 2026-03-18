@@ -1,4 +1,4 @@
-import threading
+import os
 from .config_loader import FOLDER_NAME, APP_ID
 
 class DoveApp:
@@ -26,7 +26,7 @@ class DoveApp:
         from .filesystem.folder import DoveFolder
         try:
             self.folder = DoveFolder.load()
-            if not self.folder:
+            if not self.folder or not os.path.isdir(self.folder.path):
                 self.folder = DoveFolder(FOLDER_NAME)
                 self.folder.create_directory()
 

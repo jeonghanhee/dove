@@ -5,3 +5,5 @@ keyring==25.7.0
 requests==2.32.5
 websockets==16.0
 PyQt6==6.10.2
+uvicorn==0.42.0
+fastapi==0.135.1

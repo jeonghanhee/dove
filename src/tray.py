@@ -1,65 +1,65 @@
-import pystray
 import sys
-import threading
-import time
-from PIL import Image
+import os
+from PyQt6.QtWidgets import QSystemTrayIcon, QMenu
+from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import QObject, pyqtSignal, QTimer
 from pathlib import Path
+
 from .network.auth import JwtToken
 from .config_loader import APP_PROG, APP_DESCRIPTION
 
-class DoveTray:
+class DoveTray(QObject):
+    request_open_window = pyqtSignal(str)
+
     def __init__(self):
-        self.icon = None
-        self.window_to_open = None
+        super().__init__()
+        self.tray_icon = QSystemTrayIcon()
+        self.last_auth_state = JwtToken.exists()
 
-    def _auth_label(self, item):
-        return "Disconnect" if JwtToken.exists() else "Connect"
+        base_dir = Path(__file__).resolve().parent.parent
+        icon_path = str(base_dir / "assets" / "icons" / "dove.ico")
+        
+        if os.path.exists(icon_path):
+            self.tray_icon.setIcon(QIcon(icon_path))
+        
+        self.update_menu()
+        self.tray_icon.setToolTip(APP_DESCRIPTION)
 
-    def build_menu(self):
-        return pystray.Menu(
-            pystray.MenuItem(self._auth_label, self.handle_connect_click),
-            pystray.MenuItem("Quit", self.stop),
-        )
+        self.monitor_timer = QTimer(self)
+        self.monitor_timer.timeout.connect(self.check_status_change)
+        self.monitor_timer.start(1000)
 
-    def handle_connect_click(self, icon, item):
+    def check_status_change(self):
+        current_state = JwtToken.exists()
+        if current_state != self.last_auth_state:
+            self.last_auth_state = current_state
+            self.update_menu()
+
+    def update_menu(self):
+        menu = QMenu()
+
+        auth_label = "Disconnect" if JwtToken.exists() else "Connect"
+        auth_action = menu.addAction(auth_label)
+        auth_action.triggered.connect(self.handle_auth_click)
+
+        menu.addSeparator()
+        
+        quit_action = menu.addAction("Quit")
+        quit_action.triggered.connect(self.stop)
+
+        self.tray_icon.setContextMenu(menu)
+
+    def handle_auth_click(self):
         self.request_open("connecter_window")
+        QTimer.singleShot(100, self.update_menu)
 
     def request_open(self, window_name):
-        self.window_to_open = window_name
+        self.request_open_window.emit(window_name)
         print(f"Request to open: {window_name}", flush=True)
 
-    def stop(self, icon, item):
-        if self.icon:
-            self.icon.stop()
+    def stop(self):
+        self.tray_icon.hide()
         sys.exit(0)
 
-    def _update_loop(self):
-        last_state = JwtToken.exists()
-        while True:
-            time.sleep(1)
-            current_state = JwtToken.exists()
-            if current_state != last_state:
-                last_state = current_state
-                if self.icon:
-                    self.icon.update_menu()
-                    print(f"Auth state changed: {current_state}", flush=True)
-
     def run(self):
-        base_dir = Path(__file__).resolve().parent.parent
-        icon_path = base_dir / "assets" / "icons" / "dove.ico"
-
-        try:
-            icon_image = Image.open(icon_path)
-        except Exception:
-            icon_image = Image.new("RGB", (64, 64), color=(73, 80, 87))
-
-        self.icon = pystray.Icon(
-            APP_PROG,
-            icon_image,
-            APP_DESCRIPTION,
-            menu=self.build_menu(),
-        )
-
-        threading.Thread(target=self._update_loop, daemon=True).start()
-
-        self.icon.run()
+        self.tray_icon.show()

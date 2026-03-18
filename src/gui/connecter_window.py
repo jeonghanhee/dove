@@ -10,8 +10,9 @@ if str(root_dir) not in sys.path:
 from src.gui.base_window import BaseWindow
 from src.gui.components.input_field import InputField
 from src.gui.components.button import Button
-from src.config_loader import APP_ID
+from src.config_loader import APP_ID, get_message
 from src.network.auth import request_jwt_token, JwtToken
+from src.network.notifier import send_notification
 from src.app import DoveApp
 
 class ConnecterWindow(BaseWindow):
@@ -73,6 +74,8 @@ class ConnecterWindow(BaseWindow):
         if new_token:
             print("Connection Success")
             new_token.save()
+            title, message = get_message("success_connect_server")
+            send_notification(title, message)
             self.app.token = new_token
             self.close()
         else:
@@ -83,6 +86,8 @@ class ConnecterWindow(BaseWindow):
     def handle_disconnect(self):
         print("Disconnected.")
         JwtToken.delete()
+        title, message = get_message("success_disconnect_server")
+        send_notification(title, message)
         self.app.token = None
         self.close()
 

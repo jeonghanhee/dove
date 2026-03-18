@@ -10,15 +10,12 @@ class DoveApp:
             cls._instance.folder = None
             cls._instance.token = None
             cls._instance.ws = None
-            cls._instance.tray = None
             cls._instance._initialized = False
             cls._instance._engine_started = False
         return cls._instance
 
     def __init__(self):
         if not self._initialized:
-            from .tray import DoveTray
-            self.tray = DoveTray()
             self._initialized = True
 
     def load_token(self):
@@ -72,10 +69,5 @@ class DoveApp:
 
         if not self.start_ws():
             return
-        
-        if self.tray:
-            tray_thread = threading.Thread(target=self.tray.run, daemon=True)
-            tray_thread.start()
-            print("Tray thread started.")
 
         print(f"{APP_ID} engine services are now active.")

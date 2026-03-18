@@ -29,7 +29,7 @@ API_ENDPOINT = config.get("Endpoints", "api_endpoint")
 WS_URL = config.get("Endpoints", "ws_url")
 
 # messages
-def get_message(section: str, name: str) -> tuple[str, str]:
+def get_message(section: str, name: str = "") -> tuple[str, str]:
     title = config.get("Messages", f"{section}_title").format(name=name)
     message = config.get("Messages", f"{section}_message")
     return title, message

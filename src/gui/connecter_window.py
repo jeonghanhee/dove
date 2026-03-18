@@ -12,7 +12,7 @@ from src.gui.components.input_field import InputField
 from src.gui.components.button import Button
 from src.config_loader import APP_ID, get_message
 from src.network.auth import request_jwt_token, JwtToken
-from src.network.notifier import send_notification
+from src.network.notifier import notify
 from src.app import DoveApp
 
 class ConnecterWindow(BaseWindow):
@@ -75,7 +75,7 @@ class ConnecterWindow(BaseWindow):
             print("Connection Success")
             new_token.save()
             title, message = get_message("success_connect_server")
-            send_notification(title, message)
+            notify(title, message)
             self.app.token = new_token
             self.close()
         else:
@@ -87,7 +87,7 @@ class ConnecterWindow(BaseWindow):
         print("Disconnected.")
         JwtToken.delete()
         title, message = get_message("success_disconnect_server")
-        send_notification(title, message)
+        notify(title, message)
         self.app.token = None
         self.close()
 

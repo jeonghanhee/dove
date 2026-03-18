@@ -2,7 +2,7 @@ import os
 import time
 import threading
 from watchdog.events import FileSystemEventHandler
-from src.network.notifier import send_notification
+from src.network.notifier import notify
 from src.config_loader import get_message
 
 class FileRenameHandler(FileSystemEventHandler):
@@ -21,7 +21,7 @@ class FileRenameHandler(FileSystemEventHandler):
             self.folder_obj.old_path = old_path
             
             title, message = get_message("born", name=self.folder_obj.name)
-            send_notification(title, message)
+            notify(title, message)
 
             t = threading.Thread(target=self._delayed_set_icon, daemon=True)
             t.start()

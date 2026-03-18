@@ -43,7 +43,7 @@ class DoveApp:
     def start_ws(self) -> bool:
         from .network.ws import WsClient
         try:
-            self.ws = WsClient()
+            self.ws = WsClient(auth_token=self.token)
             self.ws.on_message(lambda msg: print("[ws]", msg))
             self.ws.start()
             return True
@@ -54,6 +54,7 @@ class DoveApp:
     def stop(self):
         if self.ws:
             self.ws.stop()
+            
         if self.folder:
             self.folder.stop_watch()
         self.token = None
